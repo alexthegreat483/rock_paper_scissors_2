@@ -1,66 +1,93 @@
 """
 Game logic for Rock Paper Scissors game
 """
-from .models import Player, Enemy
+from .models import Player, Enemy, determine_outcome
+from .settings import (
+    POINTS_FOR_FIGHT, POINTS_FOR_KILLING, 
+    WIN, LOSE, DRAW
+)
 from .score import save_score
+from .exceptions import InvalidChoiceError
+
 
 class Game:
-    """Game class"""
-    def __init__(self, player_name, difficulty):
-        self.player = Player(player_name, difficulty)
-        self.difficulty = difficulty
-        self.enemy_level = 1
-        self.enemy = Enemy(self.enemy_level, difficulty)
+    """Main game class that controls the game flow"""
+    
+    def __init__(self, player_name, mode):
+        """Initialize the game with player name and mode"""
+        self.player = Player(player_name, mode)
+        self.mode = mode
+        self.current_enemy_level = 1
+        self.enemy = Enemy(self.current_enemy_level, mode)
+    
+    def display_status(self):
+        """Display current game status"""
+        print("\n" + "-" * 40)
+        print(f"Player: {self.player.name} | Lives: {self.player.lives} | Score: {self.player.score}")
+        print(f"Enemy Level: {self.current_enemy_level} | Lives: {self.enemy.lives}")
+        print("-" * 40)
+    
+    def play_round(self):
+        """Play a single round of the game"""
+        self.display_status()
+        
+        try:
+            player_attack = self.player.choose_attack()
+            enemy_attack = self.enemy.choose_attack()
+            
+            print(f"\nYou chose: {player_attack}")
+            print(f"Enemy chose: {enemy_attack}")
+            
+            outcome = determine_outcome(player_attack, enemy_attack)
+            
+            if outcome == WIN:
+                print("You win this round!")
+                self.enemy.lives -= 1
+                self.player.add_score(POINTS_FOR_FIGHT)
+                
+                if self.enemy.lives <= 0:
+                    enemy_bonus = POINTS_FOR_KILLING * self.current_enemy_level
+                    self.player.add_score(enemy_bonus)
+                    print(f"\nYou defeated enemy level {self.current_enemy_level}!")
+                    print(f"Bonus points: +{enemy_bonus}")
+                    
+                    self.current_enemy_level += 1
+                    self.enemy = Enemy(self.current_enemy_level, self.mode)
+                    print(f"Prepare to face enemy level {self.current_enemy_level}!")
+                    
+            elif outcome == LOSE:
+                print("You lose this round!")
+                self.player.lives -= 1
+                
+                if self.player.lives <= 0:
+                    return False
+                    
+            else:  
+                print("It's a tie!")
+                
+            return True
+            
+        except InvalidChoiceError as e:
+            print(f"Error: {e}")
+            return True  
     
     def start(self):
-        """Start the game"""
-        print(f"\nStarting game on {self.difficulty} mode")
+        """Start and run the game"""
+        print(f"\nStarting game for {self.player.name} on {self.mode} mode")
         print(f"You have {self.player.lives} lives")
-        print(f"Enemy has {self.enemy.lives} lives")
+        print("Each round, choose your attack using the number keys")
         
-        while self.player.lives > 0:
-            self._play_round()
+        game_running = True
+        while game_running and self.player.lives > 0:
+            game_running = self.play_round()
             
-        print("\nGAME OVER!")
-        print(f"You reached enemy level {self.enemy_level}")
+        print("\nGAME OVER")
+        print(f"You reached enemy level {self.current_enemy_level}")
         print(f"Final score: {self.player.score}")
         
         save_score(
             self.player.name,
-            self.difficulty,
-            self.enemy_level,
+            self.mode,
+            self.current_enemy_level,
             self.player.score
         )
-    
-    def _play_round(self):
-        """Play one round"""
-        print(f"\n--- Round ---")
-        print(f"Your lives: {self.player.lives} | Score: {self.player.score}")
-        print(f"Enemy level: {self.enemy_level} | Lives: {self.enemy.lives}")
-    
-        player_choice = self.player.choose_move()
-        enemy_choice = self.enemy.choose_move()
-        print(f"You chose: {player_choice}")
-        print(f"Enemy chose: {enemy_choice}")
-        
-        if player_choice == enemy_choice:
-            print("It's a tie!")
-        elif (player_choice == "rock" and enemy_choice == "scissors") or \
-             (player_choice == "paper" and enemy_choice == "rock") or \
-             (player_choice == "scissors" and enemy_choice == "paper"):
-            print("You win this round!")
-            self.enemy.lives -= 1
-            self.player.score += 10
-            
-            if self.enemy.lives <= 0:
-                bonus = self.enemy_level * 20
-                self.player.score += bonus
-                print(f"You defeated enemy level {self.enemy_level}!")
-                print(f"Bonus points: +{bonus}")
-                
-                self.enemy_level += 1
-                self.enemy = Enemy(self.enemy_level, self.difficulty)
-                print(f"Next enemy (level {self.enemy_level}) has {self.enemy.lives} lives")
-        else:
-            print("You lose this round!")
-            self.player.lives -= 1
