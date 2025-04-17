@@ -13,7 +13,8 @@ def display_menu():
     print("=" * 40)
     print("1. Start New Game")
     print("2. View High Scores")
-    print("3. Exit")
+    print("3. Settings")
+    print("4. Exit")  
     print("=" * 40)
 
 
@@ -35,22 +36,33 @@ def main():
     while True:
         display_menu()
         
-        choice = input("\nEnter choice (1-3): ")
-        
+        choice = input("\nEnter choice (1-4): ")
+
         if choice == '1':
             name = input("\nEnter your name: ")
             mode = select_mode()
-            
-            game = Game(name, mode)
+
+            from game.settings import SettingsManager
+            if 'settings' not in globals():
+                global settings
+                settings = SettingsManager()
+
+            game = Game(name, mode, settings)
             game.start()
-            
+
+
         elif choice == '2':
             show_scores()
-            
+
         elif choice == '3':
+            from game.settings import SettingsManager
+            settings = SettingsManager()
+            settings.update()
+
+        elif choice == '4':
             print("\nThanks for playing! Goodbye!")
             break
-            
+
         else:
             print("Invalid choice. Please try again.")
 

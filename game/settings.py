@@ -43,3 +43,31 @@ ATTACK_PAIRS_OUTCOME = {
     (SCISSORS, STONE): LOSE,
     (SCISSORS, SCISSORS): DRAW
 }
+
+class SettingsManager:
+    def __init__(self):
+        self.player_lives = PLAYER_LIVES
+        self.points_for_fight = POINTS_FOR_FIGHT
+        self.points_for_killing = POINTS_FOR_KILLING
+
+    def show(self):
+        print("\nCurrent Game Settings:")
+        print(f"1. Player Lives: {self.player_lives}")
+        print(f"2. Points for Winning a Round: {self.points_for_fight}")
+        print(f"3. Points for Killing an Enemy: {self.points_for_killing}")
+        print("4. Exit settings")
+
+    def update(self):
+        while True:
+            self.show()
+            choice = input("Enter setting number to change or 4 to exit: ")
+            if choice == "1":
+                self.player_lives = int(input("Enter new number of lives: "))
+            elif choice == "2":
+                self.points_for_fight = int(input("Enter new points for winning a round: "))
+            elif choice == "3":
+                self.points_for_killing = int(input("Enter new points for killing an enemy: "))
+            elif choice == "4":
+                break
+            else:
+                print("Invalid choice. Try again.")

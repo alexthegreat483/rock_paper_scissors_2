@@ -13,11 +13,12 @@ from .exceptions import InvalidChoiceError
 class Player:
     """Player class representing the human player"""
     
-    def __init__(self, name, mode):
+    def __init__(self, name, mode, lives=PLAYER_LIVES):
         self.name = name
         self.mode = mode
-        self.lives = PLAYER_LIVES
+        self.lives = lives
         self.score = 0
+
     
     def choose_attack(self):
         """Get player's attack choice"""
