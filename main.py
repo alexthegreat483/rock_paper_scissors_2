@@ -4,6 +4,8 @@ Rock Paper Scissors Game - Main Script
 from game.game import Game
 from game.score import show_scores
 from game.settings import MODES
+from game.settings import MODES, SettingsManager
+
 
 
 def display_menu():
@@ -33,6 +35,8 @@ def select_mode():
 
 def main():
     """Main function to run the game"""
+    settings = SettingsManager()  
+
     while True:
         display_menu()
         
@@ -41,23 +45,14 @@ def main():
         if choice == '1':
             name = input("\nEnter your name: ")
             mode = select_mode()
-
-            from game.settings import SettingsManager
-            if 'settings' not in globals():
-                global settings
-                settings = SettingsManager()
-
-            game = Game(name, mode, settings)
+            game = Game(name, mode, settings)  
             game.start()
-
 
         elif choice == '2':
             show_scores()
 
         elif choice == '3':
-            from game.settings import SettingsManager
-            settings = SettingsManager()
-            settings.update()
+            settings.update()  
 
         elif choice == '4':
             print("\nThanks for playing! Goodbye!")

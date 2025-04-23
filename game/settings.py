@@ -61,13 +61,20 @@ class SettingsManager:
         while True:
             self.show()
             choice = input("Enter setting number to change or 4 to exit: ")
-            if choice == "1":
-                self.player_lives = int(input("Enter new number of lives: "))
-            elif choice == "2":
-                self.points_for_fight = int(input("Enter new points for winning a round: "))
-            elif choice == "3":
-                self.points_for_killing = int(input("Enter new points for killing an enemy: "))
-            elif choice == "4":
-                break
-            else:
-                print("Invalid choice. Try again.")
+            try:
+                if choice == "1":
+                    new_lives = int(input("Enter new number of lives: "))
+                    self.player_lives = new_lives
+                elif choice == "2":
+                    new_fight_score = int(input("Enter new points for winning a round: "))
+                    self.points_for_fight = new_fight_score
+                elif choice == "3":
+                    new_kill_score = int(input("Enter new points for killing an enemy: "))
+                    self.points_for_killing = new_kill_score
+                elif choice == "4":
+                    break
+                else:
+                    print("Invalid choice. Try again.")
+            except ValueError:
+                print("⚠️ Please enter a valid number.")
+

@@ -16,7 +16,7 @@ def save_score(name, mode, level, score):
     """
     try:
         with open(SCORE_FILE, "a") as file:
-            file.write(f"{name},{mode},{level},{score}\n")
+            file.write(f"{name:<15} | {mode:<8} | {level:<5} | {score:<5}\n")
         print(f"Score saved: {score} points")
     except Exception as e:
         print(f"Could not save score: {e}")
@@ -50,20 +50,21 @@ def load_scores():
 
 
 def show_scores():
-    """Display high scores"""
-    scores = load_scores()
-    
-    if not scores:
+    """Display high scores in a structured format"""
+    try:
+        with open(SCORE_FILE, "r") as file:
+            lines = file.readlines()
+    except FileNotFoundError:
         print("\nNo scores yet!")
         return
-    
-    scores.sort(key=lambda x: x[3], reverse=True)
-    
-    print(f"\n===== TOP {MAX_RECORDS_NUMBER} SCORES =====")
-    print(f"{'#':<3}{'Name':<15}{'Mode':<10}{'Level':<8}{'Score':<8}")
-    print("-" * 40)
-    
-    for i, (name, mode, level, score) in enumerate(scores[:MAX_RECORDS_NUMBER], 1):
-        print(f"{i:<3}{name:<15}{mode:<10}{level:<8}{score:<8}")
-    
-    print("=" * 40)
+
+    if not lines:
+        print("\nNo scores yet!")
+        return
+
+    print("\n===== GAME SCORE DATABASE =====")
+    print(f"{'Player Name':<15} | {'Mode':<8} | {'Level':<5} | {'Score':<5}")
+    print("-" * 45)
+    for line in lines:
+        print(line.strip())
+    print("=" * 45)
